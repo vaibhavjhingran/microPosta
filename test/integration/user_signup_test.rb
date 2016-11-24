@@ -1,6 +1,10 @@
 require 'test_helper'
 
 class UserSignupTest < ActionDispatch::IntegrationTest
+
+  def setup
+    ActionMailer::Base.deliveries.clear
+  end
   
   test "invalid signup information" do
     get signup_path
@@ -11,18 +15,7 @@ class UserSignupTest < ActionDispatch::IntegrationTest
                                          password_confirmation: "bar" } }
     end
     assert_template 'users/new'
-  end
-
-  test "valid signup information" do
-  	get signup_path
-  	assert_difference "User.count", 1 do
-	  post users_path, params: { user: { name:  "Kimi Raikkonen",
-                                         email: "kim@ferrari.it",
-                                         password:              "kimi123",
-                                         password_confirmation: "kimi123" } }
-    end
-    follow_redirect!
-    # assert_template 'users/show'
-    # assert is_logged_in?
+    assert_select 'div#error_explanation'
+    assert_select 'div.field_with_errors'
   end  		
 end
